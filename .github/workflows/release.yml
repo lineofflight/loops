@@ -1,0 +1,127 @@
+# On a v* tag: check, build the four release tarballs, publish the GitHub
+# release with their checksums and the Homebrew formula, and update
+# lineofflight/homebrew-tap when HOMEBREW_TAP_TOKEN is set. Run by hand on
+# a branch, it checks and builds without publishing anything.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Tag matches Cargo.toml
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n 1)
+          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "The tag is $GITHUB_REF_NAME, but Cargo.toml has version $version." >&2
+            exit 1
+          fi
+      - uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca # stable
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets --locked -- -D warnings
+      # Also runs prototype/test_loops.sh and tests/packaging.sh.
+      - run: cargo test --locked
+      - run: node --test tests/test_herdr_logic.mjs
+
+  build:
+    needs: verify
+    strategy:
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            os: macos-15
+          - target: x86_64-apple-darwin
+            os: macos-15
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-24.04
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-24.04-arm
+    runs-on: ${{ matrix.os }}
+    env:
+      TARGET: ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca # stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+      - name: Install musl-tools
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+      - run: cargo build --release --locked --target "$TARGET"
+      - name: Package
+        run: |
+          stage=$(mktemp -d)
+          cp "target/$TARGET/release/loops" LICENSE README.md "$stage/"
+          tar -czf "loops-$GITHUB_REF_NAME-$TARGET.tar.gz" -C "$stage" loops LICENSE README.md
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.target }}
+          path: loops-*.tar.gz
+          if-no-files-found: error
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Checksums and formula
+        working-directory: dist
+        run: |
+          sha256sum loops-*.tar.gz > SHA256SUMS
+          ../scripts/render-formula.sh "$GITHUB_REF_NAME" SHA256SUMS > loops.rb
+          cat SHA256SUMS
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes \
+            dist/loops-*.tar.gz dist/SHA256SUMS dist/loops.rb
+      - name: Skip the tap
+        if: env.HOMEBREW_TAP_TOKEN == ''
+        run: echo "HOMEBREW_TAP_TOKEN is not set, so lineofflight/homebrew-tap is left as it is."
+      - uses: actions/checkout@v7
+        if: env.HOMEBREW_TAP_TOKEN != ''
+        with:
+          repository: lineofflight/homebrew-tap
+          token: ${{ env.HOMEBREW_TAP_TOKEN }}
+          path: tap
+      - name: Update the tap
+        if: env.HOMEBREW_TAP_TOKEN != ''
+        working-directory: tap
+        run: |
+          mkdir -p Formula
+          cp ../dist/loops.rb Formula/loops.rb
+          git add Formula/loops.rb
+          if git diff --cached --quiet; then
+            echo "Formula/loops.rb is unchanged."
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "loops $GITHUB_REF_NAME"
+          git push

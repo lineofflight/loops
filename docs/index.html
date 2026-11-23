@@ -257,9 +257,12 @@ $ loops done 1
 
       <section class="install">
         <h2>Install</h2>
-        <pre><code>cargo install --git https://github.com/lineofflight/loops
+        <pre><code>brew install lineofflight/tap/loops
+<span class="out"># or, on macOS or Linux without Homebrew</span>
+curl -fsSL https://lineofflight.dev/loops/install.sh | sh
+<span class="out"># then</span>
 claude mcp add loops -- loops mcp</code></pre>
-        <p>Other agents take the same command, <code>loops mcp</code>. The <a href="https://github.com/lineofflight/loops#readme">README</a> has the rest.</p>
+        <p>Other agents take the same command, <code>loops mcp</code>. The <a href="https://github.com/lineofflight/loops#readme">README</a> has the rest, building from source included.</p>
       </section>
     </main>
 

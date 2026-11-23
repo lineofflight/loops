@@ -7,6 +7,18 @@ Keeps unanswered questions, pending choices, and parked ideas from getting burie
 ## Install
 
 ```
+brew install lineofflight/tap/loops
+```
+
+Or the release binary for macOS or Linux, checked against its SHA-256, into `~/.local/bin`:
+
+```
+curl -fsSL https://lineofflight.dev/loops/install.sh | sh
+```
+
+`LOOPS_VERSION` picks a release, like `v0.1.0`, instead of the latest, and `LOOPS_INSTALL_DIR` another folder. From source, with Rust 1.92 or later:
+
+```
 cargo install --git https://github.com/lineofflight/loops
 ```
 
@@ -63,6 +75,17 @@ env_vars = ["HC_TERMINAL_ID"]
 default_tools_approval_mode = "approve"
 ```
 
+## Herdr UI
+
+The Loops drawer comes as a Herdr mod and a layout. From a clone of this repository:
+
+```
+integrations/herdr/install.sh
+herdr-app do layout.switch --name loops
+```
+
+The script copies the mod's files to `~/.config/herdr-app/mods/loops` and the layout to `~/.config/herdr-app/layouts/loops.json` (`HERDR_APP_HOME` picks another home), then checks the mod with `herdr-app check`. It refuses to write through a symlink there, such as a checkout linked in for development. By hand, copy `main.js`, `tabs.js`, `logic.js`, `mod.json` and the `.svg` files from `integrations/herdr/mods/loops/` to that folder and `integrations/herdr/layouts/loops.json` to `layouts/`, then switch to the layout as above, or cycle layouts with Cmd+Shift+L.
+
 ## Development
 
 ```
@@ -71,18 +94,23 @@ cargo clippy --all-targets -- -D warnings
 node --test tests/test_herdr_logic.mjs
 ```
 
-`cargo test` also runs the prototype's `prototype/test_loops.sh` against the binary, unchanged but for its first case: outside Herdr the prototype exited 2.
+`cargo test` also runs the prototype's `prototype/test_loops.sh` against the binary, unchanged but for its first case: outside Herdr the prototype exited 2. And `tests/packaging.sh`, which runs both install scripts and renders the formula, offline.
+
+Pushing a `v*` tag that matches `Cargo.toml`'s version releases it: `.github/workflows/release.yml` checks, builds the four tarballs (macOS and Linux, arm and Intel), publishes them on GitHub with `SHA256SUMS` and the formula, and commits the formula to `lineofflight/homebrew-tap` when the `HOMEBREW_TAP_TOKEN` secret is set. Run by hand, it checks and builds without publishing.
 
 `scripts/eval.sh` runs the multi-turn evals of the open loops instructions through `claude plugin eval`. They are real Claude Code sessions and spend tokens; `scripts/eval.sh --case question-pivot --runs 1` runs one case once.
 
 ## Layout
 
 - `src/`: the `loops` binary. `ledger.rs` is the entries and what `add` and `done` do to them, `store.rs` where they live, `mcp.rs` the MCP server and its instructions, `main.rs` the command line.
-- `tests/`: the command line (`cli.rs`, the prototype's cases ported), a session's ledger as it moves between terminals and out of Herdr (`session.rs`), the MCP server over real stdio (`mcp.rs`), the prototype's own script (`prototype.rs`), and Node unit tests for the Herdr mod logic (`test_herdr_logic.mjs`).
+- `tests/`: the command line (`cli.rs`, the prototype's cases ported), a session's ledger as it moves between terminals and out of Herdr (`session.rs`), the MCP server over real stdio (`mcp.rs`), the prototype's own script (`prototype.rs`), the install scripts and the formula (`packaging.sh`, run by `packaging.rs`), and Node unit tests for the Herdr mod logic (`test_herdr_logic.mjs`).
 - `evals/`: the eval cases (`cases/`), each a resumed session's history, the next turn and its graders, and `histories.py`, which writes the histories.
 - `scripts/eval.sh`: runs the evals against this binary.
-- `integrations/herdr/`: Herdr UI mod (`mods/loops/`, `layouts/loops.json`) adding a monochrome `∞ Loops` toggle next to `Files` and `Changes` in the top tab bar and a `Loops` drawer with 4-stage closing age rings and resting-age -> `×` hover swap.
-- `docs/`: the one-page site at <https://lineofflight.dev/loops/>, served by GitHub Pages.
+- `scripts/render-formula.sh`: renders a release's Homebrew formula from `packaging/homebrew/loops.rb` and its `SHA256SUMS`.
+- `.github/workflows/release.yml`: the release, on a `v*` tag.
+- `integrations/herdr/`: Herdr UI mod (`mods/loops/`, `layouts/loops.json`) adding a monochrome `∞ Loops` toggle next to `Files` and `Changes` in the top tab bar and a `Loops` drawer with 4-stage closing age rings and resting-age -> `×` hover swap, and `install.sh`, which copies both into Herdr.
+- `docs/`: the one-page site at <https://lineofflight.dev/loops/>, served by GitHub Pages, and `install.sh`, the release installer it serves.
+- `packaging/homebrew/loops.rb`: the formula's template.
 - `prototype/`: the Python prototype CLI (`loops`) and shell test suite (`test_loops.sh`) from `dotfiles`, the reference for the binary's behavior.
 
 ## License

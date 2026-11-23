@@ -42,8 +42,12 @@ Standalone open loops ledger for coding agents, following the same product shape
 
 ## Before you finish
 
-- `cargo fmt`, `cargo clippy --all-targets -- -D warnings`, `cargo test` (which also runs `prototype/test_loops.sh` against the binary, unchanged but for its first case, which expected exit 2 outside Herdr) and `node --test tests/test_herdr_logic.mjs`, all clean.
-- Tests never reach the user's Herdr or ledgers: they unset `HC_TERMINAL_ID` and the agents' session ids (`store::SESSION_VARS`, which your own shell has set), point `HC_BIN` at a mock `hc`, and point `HOME` at a temporary directory with the `XDG_*` variables removed.
+- `cargo fmt`, `cargo clippy --all-targets -- -D warnings`, `cargo test` (which also runs `prototype/test_loops.sh` against the binary, unchanged but for its first case, which expected exit 2 outside Herdr, and `tests/packaging.sh`, the install scripts and the formula, offline) and `node --test tests/test_herdr_logic.mjs`, all clean. Run `shellcheck` on a shell script you change.
+- Tests never reach the user's Herdr or ledgers: they unset `HC_TERMINAL_ID` and the agents' session ids (`store::SESSION_VARS`, which your own shell has set), point `HC_BIN` at a mock `hc`, and point `HOME` at a temporary directory with the `XDG_*` variables removed. `tests/packaging.sh` moves `HOME` itself, once it has found Ruby, and installs only into its own temporary directories, from a `file://` release.
+
+## Releasing
+
+Bump `version` in `Cargo.toml`, then push a matching `v*` tag, only when the user asks. `.github/workflows/release.yml` checks on Linux and macOS, builds `loops-<tag>-<target>.tar.gz` for `aarch64-apple-darwin`, `x86_64-apple-darwin`, `x86_64-unknown-linux-musl` and `aarch64-unknown-linux-musl`, publishes the release with `SHA256SUMS` and `loops.rb` (`scripts/render-formula.sh` from `packaging/homebrew/loops.rb`), and commits the formula to `lineofflight/homebrew-tap` when the `HOMEBREW_TAP_TOKEN` secret is set, skipping it otherwise. `docs/install.sh`, served at `https://lineofflight.dev/loops/install.sh`, installs from the same release.
 
 ## Evals
 
