@@ -73,6 +73,10 @@ case $out in
   *"not on your PATH"*) ;;
   *) fail "install.sh did not say $bin is not on PATH: $out" ;;
 esac
+case $out in
+  *"claude mcp add loops -- loops mcp"*) ;;
+  *) fail "install.sh did not say how to add loops to Claude Code: $out" ;;
+esac
 [ -z "$(find "$bin" -name '.loops.*')" ] || fail "install.sh left a staged file"
 
 # A version without its v is the same release.
@@ -171,6 +175,9 @@ for target in $targets; do
     fail "the formula has no checksum for $target"
 done
 grep -qF 'version "0.1.0"' "$formula" || fail "the formula has no version"
+grep -qF 'def caveats' "$formula" || fail "the formula has no caveats"
+grep -qF 'claude mcp add loops -- loops mcp' "$formula" ||
+  fail "the formula does not say how to add loops to Claude Code"
 ! grep -q '@[A-Z0-9_]*@' "$formula" || fail "the formula has a placeholder left"
 if [ -n "$ruby" ]; then
   "$ruby" -c "$formula" >/dev/null || fail "the formula is not valid Ruby"

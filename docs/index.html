@@ -6,38 +6,64 @@
   <title>loops</title>
   <meta name="description" content="An open loops ledger for coding agents.">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)">
   <meta property="og:type" content="website">
   <meta property="og:title" content="loops">
   <meta property="og:description" content="An open loops ledger for coding agents.">
   <meta property="og:url" content="https://lineofflight.dev/loops/">
   <link rel="canonical" href="https://lineofflight.dev/loops/">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -4 16 16' shape-rendering='crispEdges'%3E%3Cstyle%3Epath%7Bfill:%23222%7D@media(prefers-color-scheme:dark)%7Bpath%7Bfill:%23eee%7D%7D%3C/style%3E%3Cpath d='M0 2h1v3h-1zM14 2h1v3h-1zM2 0h3v1h-3zM10 0h3v1h-3zM1 1h1v1h-1zM5 1h1v1h-1zM9 1h1v1h-1zM13 1h1v1h-1zM6 2h1v1h-1zM8 2h1v1h-1zM7 3h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM1 5h1v1h-1zM5 5h1v1h-1zM9 5h1v1h-1zM13 5h1v1h-1zM2 6h3v1h-3zM10 6h3v1h-3z'/%3E%3C/svg%3E">
   <style>
-    /* One file, system type, nothing loaded from anywhere else. */
+    @font-face {
+      font-family: "iA Writer Quattro";
+      font-weight: 400;
+      font-display: swap;
+      src: url("fonts/iAWriterQuattroS-Regular.woff2") format("woff2");
+    }
+
+    @font-face {
+      font-family: "iA Writer Quattro";
+      font-weight: 700;
+      font-display: swap;
+      src: url("fonts/iAWriterQuattroS-Bold.woff2") format("woff2");
+    }
+
+    @font-face {
+      font-family: "iA Writer Mono";
+      font-weight: 400;
+      font-display: swap;
+      src: url("fonts/iAWriterMonoS-Regular.woff2") format("woff2");
+    }
+
+    @font-face {
+      font-family: "iA Writer Mono";
+      font-weight: 700;
+      font-display: swap;
+      src: url("fonts/iAWriterMonoS-Bold.woff2") format("woff2");
+    }
+
+    /* Ink on paper: the system's own Canvas and CanvasText, with everything
+       quieter mixed from the ink. */
     :root {
       color-scheme: light dark;
-      --base: #ffffff;
-      --raised: #f6f8fa;
-      --line: #d0d7de;
-      --text: #1f2328;
-      --subtext: #59636e;
-      --sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      --muted: color-mix(in srgb, CanvasText 55%, transparent);
+      --dim: color-mix(in srgb, CanvasText 35%, transparent);
+      --line: color-mix(in srgb, CanvasText 15%, transparent);
+      --surface: color-mix(in srgb, CanvasText 4%, transparent);
+      --amber: #a66a00;
+      --coral: #c94a36;
+      --sans: "iA Writer Quattro", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "iA Writer Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --base: #0d1117;
-        --raised: #161b22;
-        --line: #30363d;
-        --text: #e6edf3;
-        --subtext: #8b949e;
+        --amber: #e3a72f;
+        --coral: #f2836b;
       }
     }
 
     *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
 
     html {
       -webkit-text-size-adjust: 100%;
@@ -46,9 +72,9 @@
 
     body {
       margin: 0;
-      background: var(--base);
-      color: var(--text);
-      font: 400 1rem/1.6 var(--sans);
+      background: Canvas;
+      color: CanvasText;
+      font: 400 1.0625rem/1.6 var(--sans);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
@@ -58,9 +84,9 @@
       flex-direction: column;
       min-height: 100vh;
       min-height: 100svh;
-      max-width: 42rem;
+      max-width: 46rem;
       margin: 0 auto;
-      padding: 0 1.25rem;
+      padding: 0 clamp(1.25rem, 3vw, 2.5rem);
     }
 
     main { flex: 1; }
@@ -70,206 +96,528 @@
 
     a {
       color: inherit;
-      text-decoration-line: underline;
-      text-decoration-color: var(--line);
-      text-decoration-thickness: from-font;
-      text-underline-offset: 0.2em;
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
 
-    a:focus-visible {
-      outline: 2px solid var(--text);
-      outline-offset: 3px;
-      border-radius: 3px;
+    button {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
     }
 
-    code, pre { font-family: var(--mono); }
+    :is(a, button, [tabindex]):focus-visible {
+      outline: 2px solid CanvasText;
+      outline-offset: 2px;
+    }
 
     code {
-      font-size: 0.9em;
-      background: var(--raised);
-      border-radius: 5px;
-      padding: 0.1em 0.35em;
+      font: 0.875em var(--mono);
       white-space: nowrap;
     }
 
-    pre {
-      margin: 0;
-      padding: 1rem 1.125rem;
-      overflow-x: auto;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: var(--raised);
-      font-size: 0.8125rem;
-      line-height: 1.7;
-    }
-
-    pre code { padding: 0; background: none; font-size: inherit; white-space: inherit; }
-    pre .out { color: var(--subtext); }
-
-    .hero {
-      padding: clamp(3.5rem, 14vh, 8rem) 0 3rem;
-      text-align: center;
-    }
-
-    .hero svg.mark {
+    .mark {
       display: block;
-      margin: 0 auto 1rem;
-      color: var(--subtext);
+      flex: none;
+      fill: currentColor;
+      shape-rendering: crispEdges;
     }
 
-    .hero h1 {
-      margin: 0 0 0.75rem;
-      font-size: 2.75rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+    .top, footer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.5rem 1rem;
+      font: 0.875rem/1.6 var(--mono);
+      color: var(--muted);
+    }
+
+    .top {
+      align-items: center;
+      padding: clamp(1.25rem, 3vw, 2rem) 0;
+    }
+
+    .top a { text-decoration: none; }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: CanvasText;
+    }
+
+    .hero { padding-top: clamp(2.5rem, 10vh, 5.5rem); }
+
+    h1 {
+      margin: 0 0 1.25rem;
+      font-size: clamp(2rem, 6.5vw, 3.25rem);
+      font-weight: 400;
       line-height: 1.15;
+      letter-spacing: -0.02em;
     }
 
     .lede {
-      max-width: 27rem;
-      margin: 0 auto;
-      color: var(--subtext);
-      text-wrap: balance;
+      max-width: 33rem;
+      color: var(--muted);
     }
 
-    .lede.lead {
-      margin-bottom: 0.25rem;
-      color: var(--text);
-      font-size: 1.125rem;
-    }
+    .install { margin-top: 2.25rem; }
 
-    .button {
-      display: inline-flex;
+    .tabs {
+      display: flex;
       align-items: center;
-      gap: 0.45rem;
-      margin-top: 1.75rem;
-      padding: 0.45rem 1rem 0.45rem 0.875rem;
-      border: 1px solid var(--text);
-      border-radius: 999px;
-      background: var(--text);
-      color: var(--base);
-      font-size: 0.8125rem;
-      font-weight: 500;
-      line-height: 1.5;
-      text-decoration: none;
+      margin: 0 0 0.5rem -1ch;
+      font: 0.875rem/1.6 var(--mono);
+      color: var(--muted);
     }
 
-    .button svg { flex-shrink: 0; }
-    .button:focus-visible { border-radius: 999px; }
+    .tabs button { padding: 0.125rem 1ch; }
+    .tabs [aria-selected="true"] { color: CanvasText; }
+
+    .command {
+      display: flex;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      font: 0.875rem/1.6 var(--mono);
+    }
+
+    /* A command too long for a phone scrolls, fading out at the edge. The
+       padding past its end keeps the fade clear of it once scrolled. */
+    .line {
+      flex: 1;
+      min-width: 0;
+      padding: 0.625rem 0 0.625rem 0.875rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-mask-image: linear-gradient(to left, transparent, #000 1.25rem);
+      mask-image: linear-gradient(to left, transparent, #000 1.25rem);
+    }
+
+    .line::-webkit-scrollbar { display: none; }
+
+    .line code {
+      display: inline-block;
+      padding-right: 1.25rem;
+      font: inherit;
+      white-space: pre;
+    }
+
+    .line code::before {
+      content: "$ ";
+      content: "$ " / "";
+      color: var(--dim);
+    }
+
+    .copy {
+      flex: none;
+      min-width: calc(6ch + 1.75rem);
+      padding: 0 0.875rem;
+      border-left: 1px solid var(--line);
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .command :focus-visible { outline-offset: -2px; }
+
+    .demo {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1rem;
+      margin-top: 4rem;
+    }
+
+    .drawer {
+      border: 1px solid var(--line);
+      font-size: 0.9375rem;
+    }
+
+    .bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0.375rem;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.125rem 0.625rem;
+      font: 0.8125rem/1.6 var(--mono);
+      color: var(--muted);
+    }
+
+    .toggle[aria-expanded="true"] {
+      background: var(--surface);
+      color: CanvasText;
+    }
+
+    .count { color: var(--dim); }
+
+    .drawer-body {
+      padding: 0.375rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .loops {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .loop {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      height: 2rem;
+      padding: 0 0.5rem 0 0.625rem;
+    }
+
+    .loop svg {
+      flex: none;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      color: var(--stage);
+    }
+
+    .loop circle { stroke-opacity: 0.2; }
+
+    .loop span:not([class]) {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .s1 { --stage: var(--dim); --age: var(--dim); }
+    .s2 { --stage: var(--muted); --age: var(--dim); }
+    .s3 { --stage: var(--amber); --age: var(--amber); }
+    .s4 { --stage: var(--coral); --age: var(--coral); }
+
+    /* The age and the × share one spot and swap in place. */
+    .end {
+      display: grid;
+      flex: none;
+      justify-items: end;
+      width: 4ch;
+      font: 0.8125rem/1 var(--mono);
+    }
+
+    .end > * { grid-area: 1 / 1; }
+    .age { color: var(--age); }
+
+    .x {
+      padding: 0.25rem;
+      margin: -0.25rem;
+      color: var(--muted);
+      font-size: 1rem;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loop:is(:hover, .open, :has(:focus-visible)) { background: var(--surface); }
+    .loop:is(:hover, .open, :has(:focus-visible)) .age { visibility: hidden; }
+
+    .loop:is(:hover, .open) .x, .x:focus-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .empty {
+      padding: 0.25rem 0.625rem;
+      line-height: 1.5rem;
+      color: var(--dim);
+    }
+
+    .reset {
+      margin-left: 0.5ch;
+      color: var(--muted);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .caption {
+      max-width: 30rem;
+      color: var(--muted);
+      font-size: 0.9375rem;
+    }
 
     .points {
       display: grid;
       gap: 1.75rem;
-      margin-top: 3rem;
+      margin-top: 4rem;
     }
 
     h2 {
       margin: 0 0 0.35rem;
-      font-size: 1.125rem;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      line-height: 1.25;
+      font-size: 1.0625rem;
+      font-weight: 700;
+      line-height: 1.35;
     }
 
-    .points p { color: var(--subtext); }
+    .points p { color: var(--muted); }
 
-    .install {
-      margin-top: 3rem;
+    .agent {
+      margin-top: 4rem;
       padding-top: 2rem;
       border-top: 1px solid var(--line);
     }
 
-    .install h2 { margin-bottom: 0.75rem; }
+    .agent h2 { margin-bottom: 0.875rem; }
 
-    .install p {
-      margin-top: 0.75rem;
-      color: var(--subtext);
-      font-size: 0.875rem;
+    .agent p {
+      margin-top: 0.875rem;
+      color: var(--muted);
+      font-size: 0.9375rem;
     }
 
     footer {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem 1.25rem;
-      margin-top: 3rem;
-      padding: 1.5rem 0 2.5rem;
-      border-top: 1px solid var(--line);
-      color: var(--subtext);
-      font-size: 0.8125rem;
+      align-items: flex-end;
+      margin-top: 4rem;
+      padding: 1.5rem 0 clamp(1.25rem, 3vw, 2rem);
     }
 
-    footer span { margin-right: auto; }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
 
     @media (hover: hover) {
-      a:hover { text-decoration-color: var(--text); }
-      .button:hover { opacity: 0.88; }
+      :is(.top a, .tabs button, .copy, .toggle, .x, .reset):hover { color: CanvasText; }
     }
 
-    @media (min-width: 38rem) {
-      .points { grid-template-columns: repeat(2, 1fr); gap: 1.75rem 2.25rem; }
+    @media (min-width: 40rem) {
+      .points { grid-template-columns: repeat(2, 1fr); gap: 1.75rem 2.5rem; }
     }
 
     @media (min-width: 46rem) {
-      .hero h1 { font-size: 3.25rem; }
+      .demo {
+        grid-template-columns: 26rem 1fr;
+        gap: 2rem;
+        align-items: start;
+      }
     }
   </style>
 </head>
 <body>
+  <svg hidden>
+    <symbol id="mark" viewBox="0 0 15 7"><path d="M0 2h1v3h-1zM14 2h1v3h-1zM2 0h3v1h-3zM10 0h3v1h-3zM1 1h1v1h-1zM5 1h1v1h-1zM9 1h1v1h-1zM13 1h1v1h-1zM6 2h1v1h-1zM8 2h1v1h-1zM7 3h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM1 5h1v1h-1zM5 5h1v1h-1zM9 5h1v1h-1zM13 5h1v1h-1zM2 6h3v1h-3zM10 6h3v1h-3z"/></symbol>
+  </svg>
+
   <div class="page">
+    <header class="top">
+      <a class="brand" href="./"><svg class="mark" width="30" height="14" aria-hidden="true"><use href="#mark"/></svg>loops</a>
+      <a href="https://github.com/lineofflight/loops">GitHub</a>
+    </header>
+
     <main>
-      <header class="hero">
-        <svg class="mark" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z"/></svg>
-        <h1>loops</h1>
-        <p class="lede lead">An open loops ledger for coding agents.</p>
-        <p class="lede">Keeps unanswered questions, pending choices and parked ideas from getting buried when a conversation pivots.</p>
-        <a class="button" href="https://github.com/lineofflight/loops">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-          Source on GitHub
-        </a>
-      </header>
+      <section class="hero">
+        <h1>An open loops ledger for coding agents.</h1>
+        <p class="lede">Your agent notes what a conversation leaves open, like an unanswered question or a parked idea, and closes it once it’s settled.</p>
 
-      <pre><code>$ loops add "Linter: ESLint or Biome?"
-<span class="out">1. Linter: ESLint or Biome?</span>
-$ loops add "Add evals for the date parser"
-<span class="out">1. Linter: ESLint or Biome?
-2. Add evals for the date parser</span>
-$ loops done 1
-<span class="out">1. Add evals for the date parser</span></code></pre>
-
-      <section class="points">
-        <div>
-          <h2>For any agent</h2>
-          <p>One small binary. <code>loops mcp</code> serves the ledger as MCP tools over stdio, to Claude Code, Codex, Antigravity or anything else that runs such a server.</p>
-        </div>
-        <div>
-          <h2>Teaches itself</h2>
-          <p>The server sends its instructions when it starts, so an agent learns when to record a loop and when to close it without edits to its <code>AGENTS.md</code>.</p>
-        </div>
-        <div>
-          <h2>Follows the session</h2>
-          <p>A ledger belongs to the agent session. Exit and resume it anywhere, and its loops are still there. A new session starts with none.</p>
-        </div>
-        <div>
-          <h2>Optional UI</h2>
-          <p>Inside Herdr, a Loops drawer lists the session’s open loops, shows how long each has waited, and dismisses one with a click.</p>
+        <div class="install">
+          <div class="tabs" role="tablist" aria-label="Install with">
+            <button type="button" role="tab" id="tab-brew" aria-controls="panel-brew" aria-selected="true">Homebrew</button>
+            <span aria-hidden="true">|</span>
+            <button type="button" role="tab" id="tab-curl" aria-controls="panel-curl" aria-selected="false" tabindex="-1">curl</button>
+          </div>
+          <div class="command">
+            <div class="line" role="tabpanel" id="panel-brew" aria-labelledby="tab-brew" tabindex="0"><code>brew install lineofflight/tap/loops</code></div>
+            <div class="line" role="tabpanel" id="panel-curl" aria-labelledby="tab-curl" tabindex="0" hidden><code>curl -fsSL https://lineofflight.dev/loops/install.sh | sh</code></div>
+            <button type="button" class="copy">copy</button>
+          </div>
         </div>
       </section>
 
-      <section class="install">
-        <h2>Install</h2>
-        <pre><code>brew install lineofflight/tap/loops
-<span class="out"># or, on macOS or Linux without Homebrew</span>
-curl -fsSL https://lineofflight.dev/loops/install.sh | sh
-<span class="out"># then</span>
-claude mcp add loops -- loops mcp</code></pre>
-        <p>Other agents take the same command, <code>loops mcp</code>. The <a href="https://github.com/lineofflight/loops#readme">README</a> has the rest, building from source included.</p>
+      <section class="demo" aria-label="The Loops drawer in Herdr">
+        <div class="drawer">
+          <div class="bar">
+            <button type="button" class="toggle" aria-expanded="true" aria-controls="drawer-body">
+              <svg class="mark" width="15" height="7" aria-hidden="true"><use href="#mark"/></svg>
+              Loops <span class="count">4</span>
+            </button>
+          </div>
+          <div class="drawer-body" id="drawer-body">
+            <ul class="loops">
+              <li class="loop s1" title="15m · Linter: ESLint or Biome?">
+                <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 0 1 13.75 8"/></svg>
+                <span>Linter: ESLint or Biome?</span>
+                <span class="end"><span class="age">15m</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
+              </li>
+              <li class="loop s2" title="4h · Add evals for the date parser">
+                <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 0 1 8 13.75"/></svg>
+                <span>Add evals for the date parser</span>
+                <span class="end"><span class="age">4h</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
+              </li>
+              <li class="loop s3" title="2d · Keep the old --force flag as an alias, or drop it?">
+                <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 1 1 2.25 8"/></svg>
+                <span>Keep the old --force flag as an alias, or drop it?</span>
+                <span class="end"><span class="age">2d</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
+              </li>
+              <li class="loop s4" title="4d · Check the staging deploy after the migration">
+                <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 1 1 7.99 2.25"/></svg>
+                <span>Check the staging deploy after the migration</span>
+                <span class="end"><span class="age">4d</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
+              </li>
+            </ul>
+            <p class="empty" hidden>No open loops in this session. <button type="button" class="reset">Reset</button></p>
+          </div>
+        </div>
+        <p class="caption">In Herdr, the Loops drawer lists the session’s open loops. Each ring fills as its loop waits, amber after a day and coral after three. Hover or tap a loop to dismiss it.</p>
+      </section>
+
+      <section class="points">
+        <div>
+          <h2>Any agent</h2>
+          <p>One small binary. <code>loops mcp</code> serves the ledger over stdio to Claude Code, Codex, Antigravity or any other MCP client.</p>
+        </div>
+        <div>
+          <h2>Brings its own instructions</h2>
+          <p>The server tells the agent when to record a loop and when to close it. No edits to <code>AGENTS.md</code>.</p>
+        </div>
+        <div>
+          <h2>Follows the session</h2>
+          <p>Each agent session has its own ledger. Resume it anywhere and its loops are still there. A new session starts empty.</p>
+        </div>
+        <div>
+          <h2>Works from the shell</h2>
+          <p><code>loops add</code>, <code>loops done</code> and <code>loops list</code> do the same from any terminal.</p>
+        </div>
+      </section>
+
+      <section class="agent">
+        <h2>Add it to your agent</h2>
+        <div class="command">
+          <div class="line" tabindex="0"><code>claude mcp add loops -- loops mcp</code></div>
+          <button type="button" class="copy">copy</button>
+        </div>
+        <p>Other agents take the same command, <code>loops mcp</code>. The <a href="https://github.com/lineofflight/loops#readme">README</a> covers Codex, Antigravity, the Herdr drawer and building from source.</p>
       </section>
     </main>
 
     <footer>
-      <span>© Line of Flight · MIT</span>
+      <span>© <a href="https://lineofflig.ht">Line of Flight</a> | MIT</span>
       <a href="https://github.com/lineofflight/loops">GitHub</a>
     </footer>
   </div>
+
+  <p class="sr-only" role="status" id="status"></p>
+
+  <script>
+    const status = document.getElementById('status');
+
+    // Install tabs: click, or arrow keys, Home and End.
+    const tabs = [...document.querySelectorAll('[role="tab"]')];
+
+    function select(tab) {
+      for (const t of tabs) {
+        const on = t === tab;
+        t.setAttribute('aria-selected', on);
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      }
+    }
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(tab));
+      tab.addEventListener('keydown', (e) => {
+        const to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+        if (to === undefined) return;
+        e.preventDefault();
+        const next = tabs[(to + tabs.length) % tabs.length];
+        select(next);
+        next.focus();
+      });
+    });
+
+    // Copy the shown command. Without the async clipboard (an insecure
+    // origin, an old browser), a hidden textarea and execCommand.
+    function fallback(text) {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.cssText = 'position:fixed;opacity:0';
+      document.body.append(area);
+      area.select();
+      const ok = document.execCommand('copy');
+      area.remove();
+      return ok;
+    }
+
+    for (const button of document.querySelectorAll('.copy')) {
+      let timer;
+      button.addEventListener('click', async () => {
+        const code = button.parentElement.querySelector('.line:not([hidden]) code');
+        let ok;
+        try {
+          await navigator.clipboard.writeText(code.textContent);
+          ok = true;
+        } catch {
+          ok = fallback(code.textContent);
+        }
+        if (!ok) getSelection().selectAllChildren(code);
+        button.textContent = ok ? 'copied' : 'copy';
+        status.textContent = ok ? 'Copied' : 'Press Command or Control C to copy';
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          button.textContent = 'copy';
+          status.textContent = '';
+        }, 1600);
+      });
+    }
+
+    // The drawer: the toggle opens and closes it, × dismisses a loop, and
+    // Reset brings them all back. A touch shows a row's × as a hover would.
+    const toggle = document.querySelector('.toggle');
+    const body = document.getElementById('drawer-body');
+    const list = document.querySelector('.loops');
+    const count = document.querySelector('.count');
+    const empty = document.querySelector('.empty');
+    const loops = list.innerHTML;
+
+    function update() {
+      const n = list.children.length;
+      count.textContent = n;
+      count.hidden = !n;
+      empty.hidden = n > 0;
+    }
+
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') !== 'true';
+      toggle.setAttribute('aria-expanded', open);
+      body.hidden = !open;
+    });
+
+    list.addEventListener('click', (e) => {
+      const row = e.target.closest('.loop');
+      if (!row) return;
+      if (e.target.closest('.x')) {
+        const next = row.nextElementSibling ?? row.previousElementSibling;
+        row.remove();
+        update();
+        (next?.querySelector('.x') ?? empty.querySelector('.reset')).focus();
+        return;
+      }
+      if (matchMedia('(hover: none)').matches) {
+        for (const r of list.children) r.classList.toggle('open', r === row && !r.classList.contains('open'));
+      }
+    });
+
+    empty.querySelector('.reset').addEventListener('click', () => {
+      list.innerHTML = loops;
+      update();
+      toggle.focus();
+    });
+  </script>
 </body>
 </html>

@@ -31,6 +31,15 @@ class Loops < Formula
     bin.install "loops"
   end
 
+  def caveats
+    <<~EOS
+      Add loops to Claude Code:
+        claude mcp add loops -- loops mcp
+
+      Other agents take the same command: loops mcp
+    EOS
+  end
+
   test do
     assert_match "1. Check the formula", shell_output("#{bin}/loops add 'Check the formula'")
   end
