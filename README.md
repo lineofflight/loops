@@ -82,6 +82,7 @@ node --test tests/test_herdr_logic.mjs
 - `evals/`: the eval cases (`cases/`), each a resumed session's history, the next turn and its graders, and `histories.py`, which writes the histories.
 - `scripts/eval.sh`: runs the evals against this binary.
 - `integrations/herdr/`: Herdr UI mod (`mods/loops/`, `layouts/loops.json`) adding a monochrome `∞ Loops` toggle next to `Files` and `Changes` in the top tab bar and a `Loops` drawer with 4-stage closing age rings and resting-age -> `×` hover swap.
+- `docs/`: the one-page site at <https://lineofflight.dev/loops/>, served by GitHub Pages.
 - `prototype/`: the Python prototype CLI (`loops`) and shell test suite (`test_loops.sh`) from `dotfiles`, the reference for the binary's behavior.
 
 ## License
