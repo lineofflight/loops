@@ -11,7 +11,7 @@
   <meta property="og:description" content="An open loops ledger for coding agents.">
   <meta property="og:url" content="https://lineofflight.dev/loops/">
   <link rel="canonical" href="https://lineofflight.dev/loops/">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -4 16 16' shape-rendering='crispEdges'%3E%3Cstyle%3Epath%7Bfill:%23222%7D@media(prefers-color-scheme:dark)%7Bpath%7Bfill:%23eee%7D%7D%3C/style%3E%3Cpath d='M0 2h1v3h-1zM14 2h1v3h-1zM2 0h3v1h-3zM10 0h3v1h-3zM1 1h1v1h-1zM5 1h1v1h-1zM9 1h1v1h-1zM13 1h1v1h-1zM6 2h1v1h-1zM8 2h1v1h-1zM7 3h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM1 5h1v1h-1zM5 5h1v1h-1zM9 5h1v1h-1zM13 5h1v1h-1zM2 6h3v1h-3zM10 6h3v1h-3z'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z'/%3E%3C/svg%3E">
   <style>
     @font-face {
       font-family: "iA Writer Quattro";
@@ -84,7 +84,7 @@
       flex-direction: column;
       min-height: 100vh;
       min-height: 100svh;
-      max-width: 46rem;
+      max-width: 62rem;
       margin: 0 auto;
       padding: 0 clamp(1.25rem, 3vw, 2.5rem);
     }
@@ -123,8 +123,6 @@
     .mark {
       display: block;
       flex: none;
-      fill: currentColor;
-      shape-rendering: crispEdges;
     }
 
     .top, footer {
@@ -137,24 +135,26 @@
     }
 
     .top {
+      justify-content: flex-end;
       align-items: center;
       padding: clamp(1.25rem, 3vw, 2rem) 0;
     }
 
     .top a { text-decoration: none; }
 
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      color: CanvasText;
+    .hero {
+      padding-top: clamp(2rem, 8vh, 4.5rem);
+      text-align: center;
     }
 
-    .hero { padding-top: clamp(2.5rem, 10vh, 5.5rem); }
+    .hero .mark {
+      margin: 0 auto 1.25rem;
+      color: var(--muted);
+    }
 
     h1 {
       margin: 0 0 1.25rem;
-      font-size: clamp(2rem, 6.5vw, 3.25rem);
+      font-size: clamp(2rem, 6.5vw, 3rem);
       font-weight: 400;
       line-height: 1.15;
       letter-spacing: -0.02em;
@@ -162,15 +162,20 @@
 
     .lede {
       max-width: 33rem;
+      margin: 0 auto;
       color: var(--muted);
     }
 
-    .install { margin-top: 2.25rem; }
+    .install {
+      max-width: 40rem;
+      margin: 2.25rem auto 0;
+    }
 
     .tabs {
       display: flex;
       align-items: center;
-      margin: 0 0 0.5rem -1ch;
+      justify-content: center;
+      margin-bottom: 0.5rem;
       font: 0.875rem/1.6 var(--mono);
       color: var(--muted);
     }
@@ -183,6 +188,7 @@
       border: 1px solid var(--line);
       background: var(--surface);
       font: 0.875rem/1.6 var(--mono);
+      text-align: left;
     }
 
     /* A command too long for a phone scrolls, fading out at the edge. The
@@ -348,25 +354,20 @@
       font-size: 0.9375rem;
     }
 
-    .points {
-      display: grid;
-      gap: 1.75rem;
-      margin-top: 4rem;
-    }
 
     h2 {
-      margin: 0 0 0.35rem;
+      margin: 0;
       font-size: 1.0625rem;
       font-weight: 700;
       line-height: 1.35;
     }
 
-    .points p { color: var(--muted); }
-
     .agent {
-      margin-top: 4rem;
+      max-width: 40rem;
+      margin: 4rem auto 0;
       padding-top: 2rem;
       border-top: 1px solid var(--line);
+      text-align: center;
     }
 
     .agent h2 { margin-bottom: 0.875rem; }
@@ -396,13 +397,9 @@
       :is(.top a, .tabs button, .copy, .toggle, .x, .reset):hover { color: CanvasText; }
     }
 
-    @media (min-width: 40rem) {
-      .points { grid-template-columns: repeat(2, 1fr); gap: 1.75rem 2.5rem; }
-    }
-
     @media (min-width: 46rem) {
       .demo {
-        grid-template-columns: 26rem 1fr;
+        grid-template-columns: 28rem minmax(0, 1fr);
         gap: 2rem;
         align-items: start;
       }
@@ -411,29 +408,29 @@
 </head>
 <body>
   <svg hidden>
-    <symbol id="mark" viewBox="0 0 15 7"><path d="M0 2h1v3h-1zM14 2h1v3h-1zM2 0h3v1h-3zM10 0h3v1h-3zM1 1h1v1h-1zM5 1h1v1h-1zM9 1h1v1h-1zM13 1h1v1h-1zM6 2h1v1h-1zM8 2h1v1h-1zM7 3h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM1 5h1v1h-1zM5 5h1v1h-1zM9 5h1v1h-1zM13 5h1v1h-1zM2 6h3v1h-3zM10 6h3v1h-3z"/></symbol>
+    <symbol id="mark" viewBox="0 0 24 24"><path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   </svg>
 
   <div class="page">
     <header class="top">
-      <a class="brand" href="./"><svg class="mark" width="30" height="14" aria-hidden="true"><use href="#mark"/></svg>loops</a>
       <a href="https://github.com/lineofflight/loops">GitHub</a>
     </header>
 
     <main>
       <section class="hero">
-        <h1>An open loops ledger for coding agents.</h1>
+        <svg class="mark" width="56" height="56" stroke-width="1.4" aria-hidden="true"><use href="#mark"/></svg>
+        <h1>Open loops ledger for coding agents.</h1>
         <p class="lede">Your agent notes what a conversation leaves open, like an unanswered question or a parked idea, and closes it once it’s settled.</p>
 
         <div class="install">
           <div class="tabs" role="tablist" aria-label="Install with">
-            <button type="button" role="tab" id="tab-brew" aria-controls="panel-brew" aria-selected="true">Homebrew</button>
+            <button type="button" role="tab" id="tab-curl" aria-controls="panel-curl" aria-selected="true">curl</button>
             <span aria-hidden="true">|</span>
-            <button type="button" role="tab" id="tab-curl" aria-controls="panel-curl" aria-selected="false" tabindex="-1">curl</button>
+            <button type="button" role="tab" id="tab-brew" aria-controls="panel-brew" aria-selected="false" tabindex="-1">Homebrew</button>
           </div>
           <div class="command">
-            <div class="line" role="tabpanel" id="panel-brew" aria-labelledby="tab-brew" tabindex="0"><code>brew install lineofflight/tap/loops</code></div>
-            <div class="line" role="tabpanel" id="panel-curl" aria-labelledby="tab-curl" tabindex="0" hidden><code>curl -fsSL https://lineofflight.dev/loops/install.sh | sh</code></div>
+            <div class="line" role="tabpanel" id="panel-curl" aria-labelledby="tab-curl" tabindex="0"><code>curl -fsSL https://lineofflight.dev/loops/install.sh | sh</code></div>
+            <div class="line" role="tabpanel" id="panel-brew" aria-labelledby="tab-brew" tabindex="0" hidden><code>brew install lineofflight/tap/loops</code></div>
             <button type="button" class="copy">copy</button>
           </div>
         </div>
@@ -443,57 +440,39 @@
         <div class="drawer">
           <div class="bar">
             <button type="button" class="toggle" aria-expanded="true" aria-controls="drawer-body">
-              <svg class="mark" width="15" height="7" aria-hidden="true"><use href="#mark"/></svg>
+              <svg class="mark" width="14" height="14" stroke-width="1.8" aria-hidden="true"><use href="#mark"/></svg>
               Loops <span class="count">4</span>
             </button>
           </div>
           <div class="drawer-body" id="drawer-body">
             <ul class="loops">
-              <li class="loop s1" title="15m · Linter: ESLint or Biome?">
+              <li class="loop s1" title="15m · Install: Homebrew or curl?">
                 <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 0 1 13.75 8"/></svg>
-                <span>Linter: ESLint or Biome?</span>
+                <span>Install: Homebrew or curl?</span>
                 <span class="end"><span class="age">15m</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
               </li>
-              <li class="loop s2" title="4h · Add evals for the date parser">
+              <li class="loop s2" title="4h · Add loops to Claude Code">
                 <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 0 1 8 13.75"/></svg>
-                <span>Add evals for the date parser</span>
+                <span>Add loops to Claude Code</span>
                 <span class="end"><span class="age">4h</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
               </li>
-              <li class="loop s3" title="2d · Keep the old --force flag as an alias, or drop it?">
+              <li class="loop s3" title="2d · Install Herdr drawer">
                 <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 1 1 2.25 8"/></svg>
-                <span>Keep the old --force flag as an alias, or drop it?</span>
+                <span>Install Herdr drawer</span>
                 <span class="end"><span class="age">2d</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
               </li>
-              <li class="loop s4" title="4d · Check the staging deploy after the migration">
+              <li class="loop s4" title="4d · That other idea that got buried">
                 <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 1 1 7.99 2.25"/></svg>
-                <span>Check the staging deploy after the migration</span>
+                <span>That other idea that got buried</span>
                 <span class="end"><span class="age">4d</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
               </li>
             </ul>
             <p class="empty" hidden>No open loops in this session. <button type="button" class="reset">Reset</button></p>
           </div>
         </div>
-        <p class="caption">In Herdr, the Loops drawer lists the session’s open loops. Each ring fills as its loop waits, amber after a day and coral after three. Hover or tap a loop to dismiss it.</p>
+        <p class="caption">Loops in Herdr. Each ring fills as its loop waits, amber after a day and coral after three. Hover or tap a loop to dismiss it.</p>
       </section>
 
-      <section class="points">
-        <div>
-          <h2>Any agent</h2>
-          <p>One small binary. <code>loops mcp</code> serves the ledger over stdio to Claude Code, Codex, Antigravity or any other MCP client.</p>
-        </div>
-        <div>
-          <h2>Brings its own instructions</h2>
-          <p>The server tells the agent when to record a loop and when to close it. No edits to <code>AGENTS.md</code>.</p>
-        </div>
-        <div>
-          <h2>Follows the session</h2>
-          <p>Each agent session has its own ledger. Resume it anywhere and its loops are still there. A new session starts empty.</p>
-        </div>
-        <div>
-          <h2>Works from the shell</h2>
-          <p><code>loops add</code>, <code>loops done</code> and <code>loops list</code> do the same from any terminal.</p>
-        </div>
-      </section>
 
       <section class="agent">
         <h2>Add it to your agent</h2>
@@ -501,12 +480,12 @@
           <div class="line" tabindex="0"><code>claude mcp add loops -- loops mcp</code></div>
           <button type="button" class="copy">copy</button>
         </div>
-        <p>Other agents take the same command, <code>loops mcp</code>. The <a href="https://github.com/lineofflight/loops#readme">README</a> covers Codex, Antigravity, the Herdr drawer and building from source.</p>
+        <p><code>loops mcp</code> sends its own instructions and keeps a ledger per session. Other agents take the same command; the <a href="https://github.com/lineofflight/loops#readme">README</a> covers Codex, Antigravity, the Herdr drawer and the CLI.</p>
       </section>
     </main>
 
     <footer>
-      <span>© <a href="https://lineofflig.ht">Line of Flight</a> | MIT</span>
+      <span>© <a href="https://lineofflig.ht">Line of Flight</a></span>
       <a href="https://github.com/lineofflight/loops">GitHub</a>
     </footer>
   </div>
