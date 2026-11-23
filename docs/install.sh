@@ -80,6 +80,10 @@ main() {
       echo "  export PATH=\"$dir:\$PATH\""
       ;;
   esac
+  echo
+  echo "Next, add it to Claude Code:"
+  echo "  claude mcp add loops -- loops mcp"
+  echo "Other agents take the same command: loops mcp"
 }
 
 main "$@"

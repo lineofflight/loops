@@ -109,7 +109,7 @@ Pushing a `v*` tag that matches `Cargo.toml`'s version releases it: `.github/wor
 - `scripts/render-formula.sh`: renders a release's Homebrew formula from `packaging/homebrew/loops.rb` and its `SHA256SUMS`.
 - `.github/workflows/release.yml`: the release, on a `v*` tag.
 - `integrations/herdr/`: Herdr UI mod (`mods/loops/`, `layouts/loops.json`) adding a monochrome `∞ Loops` toggle next to `Files` and `Changes` in the top tab bar and a `Loops` drawer with 4-stage closing age rings and resting-age -> `×` hover swap, and `install.sh`, which copies both into Herdr.
-- `docs/`: the one-page site at <https://lineofflight.dev/loops/>, served by GitHub Pages, and `install.sh`, the release installer it serves.
+- `docs/`: the one-page site at <https://lineofflight.dev/loops/>, served by GitHub Pages, with its iA Writer fonts (`fonts/`), and `install.sh`, the release installer it serves.
 - `packaging/homebrew/loops.rb`: the formula's template.
 - `prototype/`: the Python prototype CLI (`loops`) and shell test suite (`test_loops.sh`) from `dotfiles`, the reference for the binary's behavior.
 
