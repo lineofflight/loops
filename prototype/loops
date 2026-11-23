@@ -1,0 +1,188 @@
+#!/usr/bin/env python3
+"""Manage session-scoped Herdr open loops on a terminal's herdr.loops label."""
+
+from __future__ import annotations
+
+import json
+import os
+import subprocess
+import sys
+import time
+from typing import Any, Dict, List, Optional
+
+LABEL_KEY = "herdr.loops"
+
+
+def usage() -> int:
+    sys.stderr.write(
+        "Usage: loops [--terminal <id>] <list [--json] | add <text>... | done <idx-or-match>... | clear>\n"
+    )
+    return 2
+
+
+def hc_bin() -> str:
+    return os.environ.get("HC_BIN") or "hc"
+
+
+def normalize(text: str) -> str:
+    return " ".join(text.split())
+
+
+def parse_entries(raw: Optional[str]) -> List[Dict[str, Any]]:
+    if not raw:
+        return []
+    try:
+        parsed = json.loads(raw)
+    except Exception:
+        return []
+    if not isinstance(parsed, list):
+        return []
+    out: List[Dict[str, Any]] = []
+    for item in parsed:
+        if isinstance(item, str):
+            cleaned = normalize(item)
+            if cleaned:
+                out.append({"t": cleaned})
+        elif isinstance(item, dict) and isinstance(item.get("t"), str):
+            cleaned = normalize(item["t"])
+            if cleaned:
+                entry: Dict[str, Any] = {"t": cleaned}
+                at = item.get("at")
+                if isinstance(at, (int, float)) and at > 0:
+                    entry["at"] = int(at)
+                out.append(entry)
+    return out
+
+
+def read_entries(terminal: str) -> List[Dict[str, Any]]:
+    proc = subprocess.run(
+        [hc_bin(), "get", "--json", terminal],
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        sys.stderr.write(proc.stderr or f"loops: failed to read terminal {terminal}\n")
+        sys.exit(proc.returncode)
+    try:
+        data = json.loads(proc.stdout)
+    except Exception as exc:
+        sys.stderr.write(f"loops: invalid JSON from hc get: {exc}\n")
+        sys.exit(1)
+    labels = data.get("labels") if isinstance(data, dict) else None
+    raw = labels.get(LABEL_KEY) if isinstance(labels, dict) else None
+    return parse_entries(raw)
+
+
+def write_entries(terminal: str, entries: List[Dict[str, Any]]) -> None:
+    kv = (
+        f"{LABEL_KEY}={json.dumps(entries, ensure_ascii=False, separators=(',', ':'))}"
+        if entries
+        else f"{LABEL_KEY}="
+    )
+    proc = subprocess.run(
+        [hc_bin(), "label", terminal, kv],
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        sys.stderr.write(proc.stderr or f"loops: failed to update terminal {terminal}\n")
+        sys.exit(proc.returncode)
+
+
+def print_entries(entries: List[Dict[str, Any]], as_json: bool = False) -> None:
+    texts = [e["t"] for e in entries]
+    if as_json:
+        print(json.dumps(texts, ensure_ascii=False))
+        return
+    for i, item in enumerate(texts, 1):
+        print(f"{i}. {item}")
+
+
+def main(argv: List[str]) -> int:
+    terminal = os.environ.get("HC_TERMINAL_ID", "").strip()
+    i = 0
+    while i < len(argv):
+        if argv[i] == "--terminal":
+            if i + 1 >= len(argv):
+                return usage()
+            terminal = argv[i + 1].strip()
+            i += 2
+        elif argv[i].startswith("--terminal="):
+            terminal = argv[i].split("=", 1)[1].strip()
+            i += 1
+        elif argv[i] in ("-h", "--help"):
+            return usage()
+        else:
+            break
+
+    rest = argv[i:]
+    if not rest:
+        return usage()
+
+    if not terminal:
+        sys.stderr.write("loops: not inside a Herdr terminal ($HC_TERMINAL_ID unset and --terminal omitted)\n")
+        return 2
+
+    cmd = rest[0]
+    args = rest[1:]
+
+    if cmd == "list":
+        as_json = "--json" in args
+        entries = read_entries(terminal)
+        print_entries(entries, as_json=as_json)
+        return 0
+
+    if cmd == "add":
+        if not args:
+            return usage()
+        entries = read_entries(terminal)
+        seen = {e["t"].casefold() for e in entries}
+        changed = False
+        now_sec = int(time.time())
+        for raw in args:
+            cleaned = normalize(raw)
+            if not cleaned:
+                continue
+            key = cleaned.casefold()
+            if key not in seen:
+                entries.append({"t": cleaned, "at": now_sec})
+                seen.add(key)
+                changed = True
+        if changed:
+            write_entries(terminal, entries)
+        print_entries(entries)
+        return 0
+
+    if cmd == "done":
+        if not args:
+            return usage()
+        entries = read_entries(terminal)
+        drop_indices: set[int] = set()
+        for token in args:
+            t = token.strip()
+            if not t:
+                continue
+            if t.isdigit():
+                idx = int(t) - 1
+                if 0 <= idx < len(entries):
+                    drop_indices.add(idx)
+                continue
+            needle = t.casefold()
+            for idx, entry in enumerate(entries):
+                if needle in entry["t"].casefold():
+                    drop_indices.add(idx)
+        next_entries = [entry for idx, entry in enumerate(entries) if idx not in drop_indices]
+        if next_entries != entries:
+            write_entries(terminal, next_entries)
+        print_entries(next_entries)
+        return 0
+
+    if cmd == "clear":
+        write_entries(terminal, [])
+        return 0
+
+    return usage()
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

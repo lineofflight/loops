@@ -1,0 +1,7 @@
+/target
+/.DS_Store
+/.worktrees
+/.superpowers
+*.d.ts
+jsconfig.json
+/.claude/worktrees
