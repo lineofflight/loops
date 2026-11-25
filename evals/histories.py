@@ -24,6 +24,7 @@ LINT_QUESTION = (
     "with the most plugins, or Biome, one fast tool that lints and formats?"
 )
 LINT_LOOP = "Linter: ESLint+Prettier or Biome?"
+TICKET_LOOP = "Affiliate 403s: file a support ticket"
 STATUS_ASK = "Quick one first: what does HTTP status 418 mean?"
 STATUS_ANSWER = (
     "418 is \"I'm a teapot\", from the 1998 April Fools' RFC 2324 (HTCPCP). "
@@ -71,16 +72,19 @@ HISTORIES = {
     "external-wait": [
         (
             "user",
-            "File a ticket with the affiliate network's support about the 403s "
-            "on our new API key. The failing request IDs are in the sync log.",
+            "Our new affiliate API key gets a 403 on every call to "
+            "/v3/conversions since this morning.",
         ),
         (
             "assistant",
-            "Filed: ticket #48213 with their support, with the three failing "
-            "request IDs and the 403 response bodies attached. They answer by "
-            "email, usually within two business days, so the key stays blocked "
-            "until they reply.",
+            "That's on their side: a new key has to be enabled for each "
+            "endpoint, and only their support can do it. It takes a ticket "
+            "from your account, with a failing request ID or two.",
         ),
+        ("user", STATUS_ASK),
+        ("call", "list", {}, "No open loops."),
+        ("call", "add", {"items": [TICKET_LOOP]}, f"1. {TICKET_LOOP}\n"),
+        ("assistant", STATUS_ANSWER),
     ],
     "unconfirmed-action": [
         (

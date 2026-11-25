@@ -1,8 +1,8 @@
 ---
 type: tool_used
 tool: mcp__plugin_loops_loops__add
-# The ticket waits on the third party's reply, which nobody here can act
-# on, and the new ask is never recorded in its own turn.
+# The ticket now waits on the third party's emailed reply, which nobody
+# here can act on: it is never recorded in place of the filed one.
 min: 0
 max: 0
 ---

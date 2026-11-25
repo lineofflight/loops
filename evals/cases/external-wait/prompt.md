@@ -1,8 +1,8 @@
 ---
-description: The agent filed a support ticket that now waits on an emailed reply; the next turn moves on, and the wait is never recorded.
-tags: [external-wait]
+description: The user files the support ticket a loop was waiting on; its loop is closed, and the wait for support's emailed reply is not recorded.
+tags: [external-wait, resolution]
 max_turns: 8
 allowed_tools: [Read]
 ---
 
-Unrelated: what does HTTP status 418 mean?
+Filed it with their support, ticket #48213. They reply by email within two business days.
