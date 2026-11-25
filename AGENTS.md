@@ -24,7 +24,7 @@ Standalone open loops ledger for coding agents, following the same product shape
    - Scoped strictly to the current session (`Other agents` intentionally omitted because Herdr's left sidebar already lists `Agents`).
    - Single-line truncated rows with full text in hover tooltip, 4-stage closing arc ring on the left (`<1h`, `<24h`, `1-3d` amber, `3d+` coral), and resting age (`15m`, `4h`, `3d`) on the right that swaps in-place to `×` on hover.
    - Installed on this machine and rig (cutover from `~/code/dotfiles` done 23 Nov 2026):
-     - `~/.local/bin/loops` is a copy of `target/release/loops`; rebuild and reinstall after changes.
+     - `~/.local/bin/loops` is a copy of `target/release/loops`; rebuild and reinstall after changes with `install -m 755 target/release/loops ~/.local/bin/loops` (or `rm -f ~/.local/bin/loops && cp target/release/loops ~/.local/bin/loops`), never a plain `cp` over the existing file. On macOS, overwriting an ARM64 ad-hoc-signed Mach-O in place keeps its inode, which invalidates the kernel's cached vnode CDHash and makes AMFI SIGKILL the binary (exit 137).
      - `loops mcp` is registered user-wide in Claude Code, in `~/.gemini/config/mcp_config.json` for Antigravity and in `~/.codex/config.toml` for Codex, there with `env_vars = ["HC_TERMINAL_ID"]` and `approval_mode = "approve"` for the `list`, `add` and `done` tools (`clear` still asks).
      - `~/.config/herdr-app/mods/loops` symlinks to `integrations/herdr/mods/loops`; `~/.config/herdr-app/layouts/loops.json` is a plain copy of `integrations/herdr/layouts/loops.json`.
      - rig has the same, minus Herdr: built there from a clone in `~/code/loops`, so updating it means pulling, rebuilding and reinstalling.
