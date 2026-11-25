@@ -26,9 +26,11 @@ Keep a ledger of open loops with this server's tools: questions the user hasn't 
 
 - Never add a newly received ask in the turn it was requested, nor anything the user puts off in that same message (\"later\", \"I'll say when\").
 - At the start of each new turn, if the user's message skipped past an unanswered question, pending choice, or parked idea from the previous turn, record it immediately before starting on the new ask: `list`, then `add`, before any other tool call or any reply.
+- Treat a task you handed the user to do outside the chat (a message to send, a booking to fix) like an unanswered question, even with no question asked: if their next message moves on without saying they're on it, done with it, or dropping it, they may have missed it, so record it the same way.
 - Check current loops with `list` before updating, so items dismissed in the UI stay dropped. Also call `list` first in every turn that follows one which left loops in the ledger, even if you don't mean to change it. A loop you recorded that `list` no longer shows was dismissed: never add it back or ask about it again.
 - Name each item in a few words; don't re-ask it in full.
 - Leave out work already in hand (a running job, another agent on it) until it has been going for more than two hours; then record it once.
+- Leave out waits on a third party, however long (a support ticket, an email reply, a vendor's or partner's approval): nobody here can act on them yet.
 - Close an item with `done` once it's answered, done, or the user says to drop it. Close or update a background job's item in the turn its result lands.
 - Carry open items through compaction summaries and handoffs.";
 
@@ -109,7 +111,7 @@ impl Loops {
 
     #[tool(
         name = "add",
-        description = "Record open loops, a few words each: a question the user skipped past, a pending choice, a parked idea, or something waiting on the user or a background job. Never one raised in this turn, nor anything the user put off in it. Ones already there are skipped. Returns the ledger."
+        description = "Record open loops, a few words each: a question the user skipped past, a pending choice, a parked idea, a task you handed the user that they moved past unconfirmed, or something waiting on the user or a background job. Never one raised in this turn, anything the user put off in it, or a wait on a third party, such as a support ticket or an email reply. Ones already there are skipped. Returns the ledger."
     )]
     async fn add(
         &self,

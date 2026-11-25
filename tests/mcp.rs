@@ -111,6 +111,8 @@ fn initialize_ships_the_loops_instructions() {
         "Never add a newly received ask in the turn it was requested",
         "At the start of each new turn, if the user's message skipped past an unanswered question, pending choice, or parked idea from the previous turn, record it immediately before starting on the new ask",
         "Check current loops with `list` before updating, so items dismissed in the UI stay dropped",
+        "Treat a task you handed the user to do outside the chat",
+        "Leave out waits on a third party",
         "\"Still open\"",
     ] {
         assert!(

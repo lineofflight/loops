@@ -43,7 +43,7 @@ fn field<'a>(fields: &'a [(String, String)], key: &str) -> Option<&'a str> {
 #[test]
 fn every_case_is_complete_and_named_for_its_folder() {
     let cases = cases();
-    assert_eq!(cases.len(), 6);
+    assert_eq!(cases.len(), 8);
     for case in cases {
         let name = case.file_name().unwrap().to_string_lossy().into_owned();
         let yaml = fields(&fs::read_to_string(case.join("case.yaml")).unwrap());

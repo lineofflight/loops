@@ -24,6 +24,7 @@ LINT_QUESTION = (
     "with the most plugins, or Biome, one fast tool that lints and formats?"
 )
 LINT_LOOP = "Linter: ESLint+Prettier or Biome?"
+TICKET_LOOP = "Affiliate 403s: file a support ticket"
 STATUS_ASK = "Quick one first: what does HTTP status 418 mean?"
 STATUS_ANSWER = (
     "418 is \"I'm a teapot\", from the 1998 April Fools' RFC 2324 (HTCPCP). "
@@ -67,6 +68,41 @@ HISTORIES = {
             f"1. Add a CI workflow\n2. {LINT_LOOP}\n",
         ),
         ("assistant", STATUS_ANSWER),
+    ],
+    "external-wait": [
+        (
+            "user",
+            "Our new affiliate API key gets a 403 on every call to "
+            "/v3/conversions since this morning.",
+        ),
+        (
+            "assistant",
+            "That's on their side: a new key has to be enabled for each "
+            "endpoint, and only their support can do it. It takes a ticket "
+            "from your account, with a failing request ID or two.",
+        ),
+        ("user", STATUS_ASK),
+        ("call", "list", {}, "No open loops."),
+        ("call", "add", {"items": [TICKET_LOOP]}, f"1. {TICKET_LOOP}\n"),
+        ("assistant", STATUS_ANSWER),
+    ],
+    "unconfirmed-action": [
+        (
+            "user",
+            "Three things: how do I undo my last commit but keep the changes, "
+            "what's a good name for a branch that fixes the date parser's time "
+            "zones, and draft a short WhatsApp to Sam saying I'll be 20 minutes "
+            "late to dinner.",
+        ),
+        (
+            "assistant",
+            "1. `git reset --soft HEAD~1` undoes the commit and keeps its "
+            "changes staged; `git reset HEAD~1` keeps them unstaged.\n\n"
+            "2. `fix-parser-time-zones`.\n\n"
+            "3. For Sam:\n\n"
+            "Hey Sam, running about 20 minutes late tonight, sorry! Order "
+            "without me if you're hungry.",
+        ),
     ],
     "footer": [
         ("user", LINT_ASK),
