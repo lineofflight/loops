@@ -75,6 +75,15 @@ env_vars = ["HC_TERMINAL_ID"]
 default_tools_approval_mode = "approve"
 ```
 
+Antigravity (`agy`) takes a plugin, in `integrations/agy/`, which registers the server and adds the one rule agy needs to read its instructions, since agy writes MCP server instructions to a file rather than into the prompt. From a clone of this repository:
+
+```
+agy plugin install ./integrations/agy
+agy plugin enable loops
+```
+
+Or place its contents under `.agents/plugins/loops` in a repository to scope it there. See [`integrations/agy/README.md`](integrations/agy/README.md).
+
 ## Herdr UI
 
 The Loops drawer comes as a Herdr mod and a layout. From a clone of this repository:
@@ -109,6 +118,7 @@ Pushing a `v*` tag that matches `Cargo.toml`'s version releases it: `.github/wor
 - `scripts/render-formula.sh`: renders a release's Homebrew formula from `packaging/homebrew/loops.rb` and its `SHA256SUMS`.
 - `.github/workflows/release.yml`: the release, on a `v*` tag.
 - `integrations/herdr/`: Herdr UI mod (`mods/loops/`, `layouts/loops.json`) adding a monochrome `∞ Loops` toggle next to `Files` and `Changes` in the top tab bar and a `Loops` drawer with 4-stage closing age rings and resting-age -> `×` hover swap, and `install.sh`, which copies both into Herdr.
+- `integrations/agy/`: the Antigravity plugin: the server (`mcp_config.json`), a one-line rule to read its instructions (`rules/AGENTS.md`) and `plugin.json`, its version kept with `Cargo.toml`'s.
 - `docs/`: the one-page site at <https://lineofflight.dev/loops/>, served by GitHub Pages, with its iA Writer fonts (`fonts/`), and `install.sh`, the release installer it serves.
 - `packaging/homebrew/loops.rb`: the formula's template.
 - `prototype/`: the Python prototype CLI (`loops`) and shell test suite (`test_loops.sh`) from `dotfiles`, the reference for the binary's behavior.

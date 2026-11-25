@@ -82,6 +82,24 @@ HISTORIES = {
             "until they reply.",
         ),
     ],
+    "unconfirmed-action": [
+        (
+            "user",
+            "Three things: how do I undo my last commit but keep the changes, "
+            "what's a good name for a branch that fixes the date parser's time "
+            "zones, and draft a short WhatsApp to Sam saying I'll be 20 minutes "
+            "late to dinner.",
+        ),
+        (
+            "assistant",
+            "1. `git reset --soft HEAD~1` undoes the commit and keeps its "
+            "changes staged; `git reset HEAD~1` keeps them unstaged.\n\n"
+            "2. `fix-parser-time-zones`.\n\n"
+            "3. For Sam:\n\n"
+            "Hey Sam, running about 20 minutes late tonight, sorry! Order "
+            "without me if you're hungry.",
+        ),
+    ],
     "footer": [
         ("user", LINT_ASK),
         (
