@@ -39,6 +39,7 @@ Standalone open loops ledger for coding agents, following the same product shape
      4. Resolution (`loops done` when answered on a later turn).
      5. Respect external UI dismissal (`loops list` checked; dismissed item is not re-added).
      6. Zero inline `"Still open"` footer in chat replies when `loops` is active.
+     7. No third-party waits (turn 1 files a support ticket that waits on an emailed reply -> turn 2 asks something unrelated -> `loops add` never called). Hakan wants these out of the ledger (25 Nov 2026): nobody here can act on them.
 
 ## Before you finish
 
@@ -58,7 +59,7 @@ Bump `version` in `Cargo.toml`, then push a matching `v*` tag, only when the use
 `scripts/eval.sh` runs `evals/cases/` through `claude plugin eval`: fresh Claude Code sessions with only a throwaway plugin named loops, whose server is `loops mcp` built from here, keeping its ledgers in a throwaway state directory and never in Herdr. The tools are `mcp__plugin_loops_loops__list`, `add`, `done` and `clear`.
 
 - Each case but `fresh-ask` resumes a session from its `history.jsonl` (`context.history_file`), so its prompt is the turn under test and the trace holds only that turn. `evals/histories.py` writes the histories; run it after changing one. A history's calls to the loops server never reached a real one: a run's ledger is what its scaffold seeds, through the plugin's `bin/loops`, since a scaffold gets none of the script's environment. That wrapper unsets the session ids: a scaffold runs before its session has one, so scaffold and server both keep the run's workspace's ledger.
-- The cases, one per item above: `question-pivot` (1), `parked-idea` (2), `fresh-ask` (3), `answered-later` (4), `dismissed` (5), `footer` (6). Every case also has `no-footer`, which fails on a footer or list (a line opening with "Still open", "Open loops" or "Carried"), not on a sentence that mentions a loop. All graders are regexes or tool counts, so no judge model runs.
+- The cases, one per item above: `question-pivot` (1), `parked-idea` (2), `fresh-ask` (3), `answered-later` (4), `dismissed` (5), `footer` (6), `external-wait` (7). Every case also has `no-footer`, which fails on a footer or list (a line opening with "Still open", "Open loops" or "Carried"), not on a sentence that mentions a loop. All graders are regexes or tool counts, so no judge model runs.
 - A count grader with `max` states `min` too: left out, it defaults to 1, so a "never called" grader fails when nothing was called. `tests/evals.rs` checks this, and that every case is whole, without running anything.
 - Run sessions see no user-level config: the harness gives each its own home and config directory, so `~/.claude/CLAUDE.md` and the user's plugins never load. Only the server's instructions mention open loops.
 - Run it after changing `INSTRUCTIONS` or a tool's description in `src/mcp.rs`, and only when the user asks: runs are real Claude Code sessions and spend tokens. 3 runs a case on sonnet, about $0.65 for the suite; `--runs`, `--model` and `--keep-temp` pass through. `--case <glob>` takes one name; `--tag <tag>`, repeated, picks several. Results land in `target/evals/<timestamp>/`.

@@ -68,6 +68,20 @@ HISTORIES = {
         ),
         ("assistant", STATUS_ANSWER),
     ],
+    "external-wait": [
+        (
+            "user",
+            "File a ticket with the affiliate network's support about the 403s "
+            "on our new API key. The failing request IDs are in the sync log.",
+        ),
+        (
+            "assistant",
+            "Filed: ticket #48213 with their support, with the three failing "
+            "request IDs and the 403 response bodies attached. They answer by "
+            "email, usually within two business days, so the key stays blocked "
+            "until they reply.",
+        ),
+    ],
     "footer": [
         ("user", LINT_ASK),
         (
