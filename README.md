@@ -40,7 +40,7 @@ A ledger belongs to the agent session. Exit a session and resume it in the same 
 
 The session's ledger is one small file, `sessions/<session id>.json` under `$XDG_STATE_HOME/loops`, else `~/.local/state/loops`, used the same way by the command line and `loops mcp`, inside Herdr and out. The id is the one the agent gives the commands it runs: `CLAUDE_CODE_SESSION_ID`, `ANTIGRAVITY_CONVERSATION_ID` or `CODEX_THREAD_ID`. `loops mcp` inherits it from the agent that starts it, as Claude Code's does, or reads it beside each call, in `_meta`, as Codex (`threadId`) and Antigravity (`antigravity.google/root_conversation_id`) send it.
 
-Inside Herdr (`$HC_TERMINAL_ID` set) the file is mirrored to the terminal's `herdr.loops` label through `hc label`, as `[{"t":"<text>","at":<unix_sec>}]`, which Herdr's Loops drawer shows. Plain strings still read. The drawer dismisses a loop by rewriting the label, and another session hands one over with `loops --terminal <id> add`, which writes that terminal's label itself, whoever runs it. So a session writes a second label beside it, `herdr.loops.mirror`, as `{"session":"<id>","loops":[...]}`: whose ledger the label mirrors and the loops as that session left them. Every read applies what changed on the label since:
+Inside Herdr (`$HC_TERMINAL_ID` set) the file is mirrored to the terminal's `herdr.loops` label through `hc label`, as `[{"t":"<text>","at":<unix_sec>}]`, which the Herdr mod shows. Plain strings still read. The mod dismisses a loop by rewriting the label, and another session hands one over with `loops --terminal <id> add`, which writes that terminal's label itself, whoever runs it. So a session writes a second label beside it, `herdr.loops.mirror`, as `{"session":"<id>","loops":[...]}`: whose ledger the label mirrors and the loops as that session left them. Every read applies what changed on the label since:
 
 - The session's own mirror: what left the label leaves the ledger, and what joined it joins.
 - Another session's mirror: a fresh session starts empty. What the earlier session left is dropped from the label, not from that session's file, so resuming it brings its loops back. Only what was added since, a hand-off, joins the ledger.
@@ -86,14 +86,18 @@ Or place its contents under `.agents/plugins/loops` in a repository to scope it 
 
 ## Herdr UI
 
-The Loops drawer comes as a Herdr mod and a layout. From a clone of this repository:
+Loops comes as a Herdr mod that works on any layout, stock `main` included, with no layout of its own. From a clone of this repository:
 
 ```
 integrations/herdr/install.sh
-herdr-app do layout.switch --name loops
+herdr-app do mod.open '{"name":"loops"}'
 ```
 
-The script copies the mod's files to `~/.config/herdr-app/mods/loops` and the layout to `~/.config/herdr-app/layouts/loops.json` (`HERDR_APP_HOME` picks another home), then checks the mod with `herdr-app check`. It refuses to write through a symlink there, such as a checkout linked in for development. By hand, copy `main.js`, `tabs.js`, `logic.js`, `mod.json` and the `.svg` files from `integrations/herdr/mods/loops/` to that folder and `integrations/herdr/layouts/loops.json` to `layouts/`, then switch to the layout as above, or cycle layouts with Cmd+Shift+L.
+Or open `Loops` from the command palette (Cmd+Shift+P). Open it once on each layout you use; it comes back with that layout and on each start.
+
+While the focused session has open loops, the status bar shows `<n> loops`, and nothing at all when it has none. Click it for a list that opens where the command palette does, with a search box that filters as you type. Up and Down move the selection. Enter, or a click on a row, pastes that loop into the terminal's prompt without sending it, by way of the clipboard. Cmd+Backspace (Ctrl+Backspace elsewhere), or the `×` that replaces a row's age under the pointer, dismisses a loop. Esc or a click outside closes the list. Each ring fills as its loop waits, amber after a day and coral after three. `loops.toggle` opens and closes the list too, for a key binding in Herdr's `keys.json`.
+
+The script copies the mod's files to `~/.config/herdr-app/mods/loops` (`HERDR_APP_HOME` picks another home), then checks the mod with `herdr-app check`. It refuses to write through a symlink there, such as a checkout linked in for development. By hand, copy `main.js`, `logic.js`, `mod.json` and the `.svg` files from `integrations/herdr/mods/loops/` to that folder, then open it as above.
 
 ## Development
 
@@ -117,7 +121,7 @@ Pushing a `v*` tag that matches `Cargo.toml`'s version releases it: `.github/wor
 - `scripts/eval.sh`: runs the evals against this binary.
 - `scripts/render-formula.sh`: renders a release's Homebrew formula from `packaging/homebrew/loops.rb` and its `SHA256SUMS`.
 - `.github/workflows/release.yml`: the release, on a `v*` tag.
-- `integrations/herdr/`: Herdr UI mod (`mods/loops/`, `layouts/loops.json`) adding a monochrome `∞ Loops` toggle next to `Files` and `Changes` in the top tab bar and a `Loops` drawer with 4-stage closing age rings and resting-age -> `×` hover swap, and `install.sh`, which copies both into Herdr.
+- `integrations/herdr/`: the Herdr mod (`mods/loops/`), which puts `<n> loops` in the status bar of any layout and opens a palette-style list to search, paste and dismiss loops, with 4-stage closing age rings and the resting age swapping to `×` under the pointer, and `install.sh`, which copies it into Herdr.
 - `integrations/agy/`: the Antigravity plugin: the server (`mcp_config.json`), a one-line rule to read its instructions (`rules/AGENTS.md`) and `plugin.json`, its version kept with `Cargo.toml`'s.
 - `docs/`: the one-page site at <https://lineofflight.dev/loops/>, served by GitHub Pages, with its iA Writer fonts (`fonts/`), and `install.sh`, the release installer it serves.
 - `packaging/homebrew/loops.rb`: the formula's template.

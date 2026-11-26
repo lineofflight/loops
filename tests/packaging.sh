@@ -106,9 +106,9 @@ if LOOPS_RELEASE_BASE_URL=file://$release LOOPS_VERSION=v9.9.9 LOOPS_INSTALL_DIR
 fi
 [ ! -e "$work/bin3/loops" ] || fail "install.sh installed a missing release"
 
-# integrations/herdr/install.sh copies the mod's runtime files and the
-# layout, and checks the mod. Its copy here has the files an editor
-# setup leaves beside the mod, which stay behind.
+# integrations/herdr/install.sh copies the mod's runtime files, and no
+# layout, and checks the mod. Its copy here has the files an editor setup
+# leaves beside the mod, which stay behind.
 herdr=$work/herdr
 cp -R "$root/integrations/herdr" "$herdr"
 touch "$herdr/mods/loops/gpui-kit.d.ts" "$herdr/mods/loops/jsconfig.json"
@@ -117,20 +117,23 @@ printf '#!/bin/sh\necho "$*" >>"%s"\n' "$work/herdr-app.log" >"$mock"
 chmod +x "$mock"
 
 app=$work/app
-HERDR_APP_HOME=$app HERDR_APP_BIN=$mock sh "$herdr/install.sh" >/dev/null ||
+out=$(HERDR_APP_HOME=$app HERDR_APP_BIN=$mock sh "$herdr/install.sh") ||
   fail "herdr install.sh failed"
 expected=$(cd "$root/integrations/herdr/mods/loops" &&
-  printf '%s\n' main.js tabs.js logic.js mod.json *.svg | sort)
+  printf '%s\n' main.js logic.js mod.json *.svg | sort)
 copied=$(cd "$app/mods/loops" && printf '%s\n' * | sort)
 [ "$copied" = "$expected" ] || fail "herdr install.sh copied $(echo "$copied" | tr "\n" " ")"
 for f in $expected; do
   cmp -s "$root/integrations/herdr/mods/loops/$f" "$app/mods/loops/$f" ||
     fail "herdr install.sh changed $f"
 done
-cmp -s "$root/integrations/herdr/layouts/loops.json" "$app/layouts/loops.json" ||
-  fail "herdr install.sh did not copy the layout"
+[ ! -e "$app/layouts" ] || fail "herdr install.sh wrote a layout"
 [ "$(cat "$work/herdr-app.log")" = "check $app/mods/loops" ] ||
   fail "herdr install.sh did not check the mod: $(cat "$work/herdr-app.log")"
+case $out in
+  *"herdr-app do mod.open '{\"name\":\"loops\"}'"*) ;;
+  *) fail "herdr install.sh did not say how to open the mod: $out" ;;
+esac
 
 # Run again, it updates the copy in place.
 HERDR_APP_HOME=$app HERDR_APP_BIN=$mock sh "$herdr/install.sh" >/dev/null ||
@@ -153,16 +156,6 @@ if HERDR_APP_HOME=$linked HERDR_APP_BIN=$mock sh "$herdr/install.sh" >/dev/null 
 fi
 grep -q "symlink" "$work/err" || fail "herdr install.sh did not say why it stopped"
 [ -z "$(ls "$work/checkout")" ] || fail "herdr install.sh wrote into the linked mod"
-
-linked=$work/linked2
-mkdir -p "$linked/layouts"
-echo '{}' >"$work/layout.json"
-ln -s "$work/layout.json" "$linked/layouts/loops.json"
-if HERDR_APP_HOME=$linked HERDR_APP_BIN=$mock sh "$herdr/install.sh" >/dev/null 2>&1; then
-  fail "herdr install.sh wrote through a linked layout"
-fi
-[ "$(cat "$work/layout.json")" = '{}' ] || fail "herdr install.sh wrote into the linked layout"
-[ ! -e "$linked/mods/loops" ] || fail "herdr install.sh copied the mod before refusing"
 
 # scripts/render-formula.sh fills in every target's URL and checksum.
 formula=$work/loops.rb

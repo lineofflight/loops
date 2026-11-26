@@ -242,36 +242,82 @@
       margin-top: 4rem;
     }
 
-    .drawer {
+    /* A corner of Herdr: the list over an empty stage, and the status bar
+       with "<n> loops" under it. The stage keeps its height with the list
+       closed, so nothing below moves. */
+    .herdr {
+      display: flex;
+      flex-direction: column;
       border: 1px solid var(--line);
       font-size: 0.9375rem;
     }
 
-    .bar {
+    .stage {
+      min-height: 14rem;
+      padding: 0.75rem;
+    }
+
+    .card {
+      padding: 0.625rem;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .search {
       display: flex;
-      justify-content: flex-end;
-      padding: 0.375rem;
+      align-items: center;
+      gap: 0.625rem;
+      height: 2.25rem;
+      margin-bottom: 0.375rem;
+      padding: 0 0.625rem;
+      border: 1px solid var(--line);
+      background: Canvas;
+      color: var(--dim);
+      cursor: text;
+    }
+
+    .search:focus-within { border-color: var(--muted); }
+
+    .search svg {
+      flex: none;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+    }
+
+    .search input {
+      flex: 1;
+      min-width: 0;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      background: none;
+      color: CanvasText;
+      font: inherit;
+    }
+
+    .search input::placeholder { color: var(--dim); opacity: 1; }
+    .search input::-webkit-search-cancel-button { display: none; }
+
+    .esc {
+      flex: none;
+      font: 0.75rem/1 var(--mono);
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 1.875rem;
+      border-top: 1px solid var(--line);
     }
 
     .toggle {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.125rem 0.625rem;
-      font: 0.8125rem/1.6 var(--mono);
-      color: var(--muted);
-    }
-
-    .toggle[aria-expanded="true"] {
-      background: var(--surface);
-      color: CanvasText;
-    }
-
-    .count { color: var(--dim); }
-
-    .drawer-body {
-      padding: 0.375rem;
-      border-top: 1px solid var(--line);
+      padding: 0.125rem 0.5rem;
+      font: 0.75rem/1.6 var(--mono);
+      color: var(--dim);
     }
 
     .loops {
@@ -345,6 +391,7 @@
       padding: 0.25rem 0.625rem;
       line-height: 1.5rem;
       color: var(--dim);
+      overflow-wrap: anywhere;
     }
 
     .reset {
@@ -442,41 +489,46 @@
         </div>
       </section>
 
-      <section class="demo" aria-label="The Loops drawer in Herdr">
-        <div class="drawer">
-          <div class="bar">
-            <button type="button" class="toggle" aria-expanded="true" aria-controls="drawer-body">
-              <svg class="mark" width="14" height="14" stroke-width="1.8" aria-hidden="true"><use href="#mark"/></svg>
-              Loops <span class="count">4</span>
-            </button>
+      <section class="demo" aria-label="Loops in Herdr">
+        <div class="herdr">
+          <div class="stage">
+            <div class="card" id="card">
+              <label class="search">
+                <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.75"/><path d="m10.5 10.5 3.25 3.25"/></svg>
+                <input type="search" placeholder="Search loops…" aria-label="Search loops" autocomplete="off" spellcheck="false">
+                <span class="esc" aria-hidden="true">Esc</span>
+              </label>
+              <ul class="loops">
+                <li class="loop s1" title="15m · Install: Homebrew or curl?">
+                  <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 0 1 13.75 8"/></svg>
+                  <span>Install: Homebrew or curl?</span>
+                  <span class="end"><span class="age">15m</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
+                </li>
+                <li class="loop s2" title="4h · Add loops to Claude Code">
+                  <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 0 1 8 13.75"/></svg>
+                  <span>Add loops to Claude Code</span>
+                  <span class="end"><span class="age">4h</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
+                </li>
+                <li class="loop s3" title="2d · Install the Herdr mod">
+                  <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 1 1 2.25 8"/></svg>
+                  <span>Install the Herdr mod</span>
+                  <span class="end"><span class="age">2d</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
+                </li>
+                <li class="loop s4" title="4d · That other idea that got buried">
+                  <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 1 1 7.99 2.25"/></svg>
+                  <span>That other idea that got buried</span>
+                  <span class="end"><span class="age">4d</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
+                </li>
+              </ul>
+              <p class="empty" id="no-match" hidden>Nothing matches “<span></span>”.</p>
+              <p class="empty" id="no-loops" hidden>No open loops in this session. <button type="button" class="reset">Reset</button></p>
+            </div>
           </div>
-          <div class="drawer-body" id="drawer-body">
-            <ul class="loops">
-              <li class="loop s1" title="15m · Install: Homebrew or curl?">
-                <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 0 1 13.75 8"/></svg>
-                <span>Install: Homebrew or curl?</span>
-                <span class="end"><span class="age">15m</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
-              </li>
-              <li class="loop s2" title="4h · Add loops to Claude Code">
-                <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 0 1 8 13.75"/></svg>
-                <span>Add loops to Claude Code</span>
-                <span class="end"><span class="age">4h</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
-              </li>
-              <li class="loop s3" title="2d · Install Herdr drawer">
-                <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 1 1 2.25 8"/></svg>
-                <span>Install Herdr drawer</span>
-                <span class="end"><span class="age">2d</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
-              </li>
-              <li class="loop s4" title="4d · That other idea that got buried">
-                <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.75"/><path d="M8 2.25A5.75 5.75 0 1 1 7.99 2.25"/></svg>
-                <span>That other idea that got buried</span>
-                <span class="end"><span class="age">4d</span><button type="button" class="x" aria-label="Dismiss">×</button></span>
-              </li>
-            </ul>
-            <p class="empty" hidden>No open loops in this session. <button type="button" class="reset">Reset</button></p>
+          <div class="status-bar">
+            <button type="button" class="toggle" aria-expanded="true" aria-controls="card">4 loops</button>
           </div>
         </div>
-        <p class="caption">Loops in Herdr. Each ring fills as its loop waits, amber after a day and coral after three. Hover or tap a loop to dismiss it.</p>
+        <p class="caption">Loops in Herdr, on any layout. While a session has some, the status bar says how many; click for a list to search. Each ring fills as its loop waits, amber after a day and coral after three. Click a loop or press Enter to paste it into the terminal, and hover or tap to dismiss it.</p>
       </section>
 
 
@@ -486,7 +538,7 @@
           <div class="line" tabindex="0"><code>claude mcp add loops -- loops mcp</code></div>
           <button type="button" class="copy">copy</button>
         </div>
-        <p><code>loops mcp</code> sends its own instructions and keeps a ledger per session. Other agents take the same command; the <a href="https://github.com/lineofflight/loops#readme">README</a> covers Codex, Antigravity, the Herdr drawer and the CLI.</p>
+        <p><code>loops mcp</code> sends its own instructions and keeps a ledger per session. Other agents take the same command; the <a href="https://github.com/lineofflight/loops#readme">README</a> covers Codex, Antigravity, the Herdr mod and the CLI.</p>
       </section>
     </main>
 
@@ -561,36 +613,66 @@
       });
     }
 
-    // The drawer: the toggle opens and closes it, × dismisses a loop, and
-    // Reset brings them all back. A touch shows a row's × as a hover would.
+    // The list: "<n> loops" opens and closes it, the search box filters it
+    // as you type, any case, × dismisses a loop, Esc closes it and Reset
+    // brings the loops back. A touch shows a row's × as a hover would.
     const toggle = document.querySelector('.toggle');
-    const body = document.getElementById('drawer-body');
+    const card = document.getElementById('card');
+    const search = card.querySelector('input');
     const list = document.querySelector('.loops');
-    const count = document.querySelector('.count');
-    const empty = document.querySelector('.empty');
+    const noMatch = document.getElementById('no-match');
+    const noLoops = document.getElementById('no-loops');
     const loops = list.innerHTML;
 
     function update() {
-      const n = list.children.length;
-      count.textContent = n;
-      count.hidden = !n;
-      empty.hidden = n > 0;
+      const rows = [...list.children];
+      const query = search.value.trim();
+      const q = query.toLowerCase();
+      let shown = 0;
+      for (const row of rows) {
+        row.hidden = Boolean(q) && !row.querySelector('span:not([class])').textContent.toLowerCase().includes(q);
+        if (!row.hidden) shown++;
+      }
+      const n = rows.length;
+      toggle.textContent = `${n} ${n === 1 ? 'loop' : 'loops'}`;
+      toggle.hidden = !n;
+      noLoops.hidden = n > 0;
+      noMatch.hidden = !n || shown > 0;
+      noMatch.querySelector('span').textContent = query;
+    }
+
+    function show(open) {
+      toggle.setAttribute('aria-expanded', open);
+      card.hidden = !open;
     }
 
     toggle.addEventListener('click', () => {
       const open = toggle.getAttribute('aria-expanded') !== 'true';
-      toggle.setAttribute('aria-expanded', open);
-      body.hidden = !open;
+      show(open);
+      if (open) search.focus();
+    });
+
+    search.addEventListener('input', update);
+
+    card.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || toggle.hidden) return;
+      e.preventDefault();
+      show(false);
+      toggle.focus();
     });
 
     list.addEventListener('click', (e) => {
       const row = e.target.closest('.loop');
       if (!row) return;
       if (e.target.closest('.x')) {
-        const next = row.nextElementSibling ?? row.previousElementSibling;
+        let next = row.nextElementSibling;
+        while (next?.hidden) next = next.nextElementSibling;
+        let prev = row.previousElementSibling;
+        while (prev?.hidden) prev = prev.previousElementSibling;
         row.remove();
         update();
-        (next?.querySelector('.x') ?? empty.querySelector('.reset')).focus();
+        const to = (next ?? prev)?.querySelector('.x') ?? (noLoops.hidden ? search : noLoops.querySelector('.reset'));
+        to.focus();
         return;
       }
       if (matchMedia('(hover: none)').matches) {
@@ -598,10 +680,12 @@
       }
     });
 
-    empty.querySelector('.reset').addEventListener('click', () => {
+    noLoops.querySelector('.reset').addEventListener('click', () => {
       list.innerHTML = loops;
+      search.value = '';
       update();
-      toggle.focus();
+      show(true);
+      search.focus();
     });
   </script>
 </body>
