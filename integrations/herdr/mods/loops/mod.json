@@ -1,1 +1,6 @@
-{ "place": "none" }
+{
+  "place": "none",
+  "title": "loops",
+  "overlay": { "kind": "window", "frame": "none" },
+  "palette": [{ "title": "Loops", "command": "mod.open", "args": { "name": "loops" }, "words": "loops open" }]
+}
