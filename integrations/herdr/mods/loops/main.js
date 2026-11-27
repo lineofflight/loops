@@ -195,7 +195,7 @@ export default class LoopsPill extends View {
         this.at = 0;
         this.shown = [];
         this.scroll = ScrollHandle.new();
-        this.input = InputState.new({ placeholder: "Search loops…" });
+        this.input = InputState.new({ placeholder: "Search open loops…" });
         this.input.on("change", (_e, changeCx) => {
           this.query = this.input.value();
           this.at = 0;
@@ -549,7 +549,7 @@ export default class LoopsPill extends View {
           .bg(t.background)
           .child(svg("mods/workspace-chrome/search.svg").size(16).text_color(t.dim))
           .when(Boolean(this.input), (el) => el.child(Input.new(this.input).flex_1().h_full().text_size(12.8).text_color(t.foreground)))
-          .when(!this.input, (el) => el.child(div().flex_1().text_size(12.8).text_color(t.dim).child("Search loops…")))
+          .when(!this.input, (el) => el.child(div().flex_1().text_size(12.8).text_color(t.dim).child("Search open loops…")))
           .child(div().text_size(11).text_color(t.dim).child("Esc"))
       )
       .child(
